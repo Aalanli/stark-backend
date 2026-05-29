@@ -148,26 +148,26 @@ impl MultiFieldTranscriptGpu {
     pub fn sync_h2d(&mut self, device_ctx: &GpuDeviceCtx) -> Result<(), MemCopyError> {
         self.ensure_device_allocated(device_ctx);
 
-        let mut ds = DeviceBn254SpongeState::default();
+        let mut ds = DeviceSpongeState::default();
 
         // Sponge state
-        for (i, &s) in self.inner.sponge_state().iter().enumerate() {
-            ds.sponge_state[i] = bn254_scalar_to_raw(s);
-        }
-        ds.absorb_idx = self.inner.absorb_idx() as u32;
-        ds.sample_idx = self.inner.sample_idx() as u32;
+        // for (i, &s) in self.inner.sponge_state().iter().enumerate() {
+        //     ds.sponge_state[i] = bn254_scalar_to_raw(s);
+        // }
+        // ds.absorb_idx = self.inner.absorb_idx() as u32;
+        // ds.sample_idx = self.inner.sample_idx() as u32;
 
         // Observe buffer
-        for (i, &bb) in self.inner.observe_buf().iter().enumerate() {
-            ds.observe_buf[i] = bb.as_canonical_u32();
-        }
-        ds.observe_buf_len = self.inner.observe_buf().len() as u32;
+        // for (i, &bb) in self.inner.observe_buf().iter().enumerate() {
+        //     ds.observe_buf[i] = bb.as_canonical_u32();
+        // }
+        // ds.observe_buf_len = self.inner.observe_buf().len() as u32;
 
         unsafe {
             cuda_memcpy_on::<false, true>(
                 self.device.as_mut_ptr() as *mut c_void,
-                &ds as *const DeviceBn254SpongeState as *const c_void,
-                std::mem::size_of::<DeviceBn254SpongeState>(),
+                &ds as *const DeviceSpongeState as *const c_void,
+                std::mem::size_of::<DeviceSpongeState>(),
                 device_ctx,
             )
         }

@@ -16,7 +16,9 @@ use openvm_stark_sdk::config::{
 use p3_baby_bear::BabyBear;
 use p3_field::{PrimeCharacteristicRing, PrimeField32};
 
-use crate::sponge::{validate_gpu_grind_bits, GpuFiatShamirTranscript, GrindError};
+use crate::sponge::{
+    validate_gpu_grind_bits, DeviceSpongeState, GpuFiatShamirTranscript, GrindError,
+};
 
 /// Bn254 digest type: one BN254 scalar element.
 type Digest = [Bn254Scalar; 1];
@@ -101,7 +103,7 @@ fn bn254_scalar_to_raw(s: Bn254Scalar) -> [u64; 4] {
 #[derive(Debug)]
 pub struct MultiFieldTranscriptGpu {
     inner: Transcript,
-    device: DeviceBuffer<DeviceBn254SpongeState>,
+    device: DeviceBuffer<DeviceSpongeState>,
 }
 
 impl Default for MultiFieldTranscriptGpu {
@@ -210,7 +212,7 @@ impl GpuFiatShamirTranscript<BabyBearBn254Poseidon2Config> for MultiFieldTranscr
 
         // 2. Run the BN254 grinding kernel.
         let witness_u32 = unsafe {
-            crate::cuda::bn254_merkle_tree::bn254_sponge_grind(
+            crate::cuda::sponge::sponge_grind(
                 self.device.as_ptr(),
                 bits as u32,
                 BabyBear::ORDER_U32 - 1,

@@ -217,7 +217,8 @@ impl GpuMerkleHash for Bn254Poseidon2MerkleHash {
         log_rows_per_query: usize,
         device_ctx: &GpuDeviceCtx,
     ) -> Result<(), CudaError> {
-        bn254_poseidon2_compressing_row_hashes(
+        let out = std::mem::transmute(out);
+        poseidon2_compressing_row_hashes(
             out,
             matrix,
             width,
@@ -235,7 +236,8 @@ impl GpuMerkleHash for Bn254Poseidon2MerkleHash {
         log_rows_per_query: usize,
         device_ctx: &GpuDeviceCtx,
     ) -> Result<(), CudaError> {
-        bn254_poseidon2_compressing_row_hashes_ext(
+        let out = std::mem::transmute(out);
+        poseidon2_compressing_row_hashes_ext(
             out,
             matrix,
             width,
@@ -251,7 +253,9 @@ impl GpuMerkleHash for Bn254Poseidon2MerkleHash {
         output_size: usize,
         device_ctx: &GpuDeviceCtx,
     ) -> Result<(), CudaError> {
-        bn254_poseidon2_adjacent_compress_layer(
+        let output = std::mem::transmute(output);
+        let prev_layer = std::mem::transmute(prev_layer);
+        poseidon2_adjacent_compress_layer(
             output,
             prev_layer,
             output_size,

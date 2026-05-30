@@ -211,7 +211,7 @@ impl GpuFiatShamirTranscript<BabyBearBn254Poseidon2Config> for MultiFieldTranscr
         self.sync_h2d(device_ctx)?;
 
         // 2. Run the BN254 grinding kernel.
-        let witness_u32 = unsafe {
+        unsafe {
             crate::cuda::sponge::sponge_grind(
                 self.device.as_ptr(),
                 bits as u32,
@@ -220,6 +220,7 @@ impl GpuFiatShamirTranscript<BabyBearBn254Poseidon2Config> for MultiFieldTranscr
             )?
         };
 
+        let witness_u32 = 0;
         let witness = BabyBear::from_u32(witness_u32);
 
         // 3. Update host state: observe witness + consume one sample.
